@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"golang-boilerplates/api/responses"
 	"net/http"
+	"strings"
 )
 
 func Responses(w http.ResponseWriter, code int, msg string, payload interface{}) {
@@ -35,6 +36,13 @@ func Responses(w http.ResponseWriter, code int, msg string, payload interface{})
 func ErrorCustomStatus(w http.ResponseWriter, code int, msg string) {
 	fmt.Println("jancok helper error")
 	Responses(w, code, msg, map[string]string{"error": msg})
+}
+
+func ToStringField(field string) string {
+	var myField []string
+	_ = json.Unmarshal([]byte(field), &myField)
+	field = strings.Join(myField, ", ")
+	return field
 }
 
 // func ToJson(w http.ResponseWriter, code int, result responses.Responses) {

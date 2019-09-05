@@ -19,7 +19,7 @@ func NewRepositoryProducts(db *gorm.DB) *respositoryProduct {
 func (r *respositoryProduct) Save(msg string) (string, error) {
 	return msg, nil
 }
-func (r *respositoryProduct) FindAll(pagination map[string]interface{}) (interface{}, error) {
+func (r *respositoryProduct) FindAll(pagination map[string]string) (interface{}, error) {
 	var err error
 	// products := []*models.Product{}
 	fmt.Println(pagination)
@@ -33,41 +33,21 @@ func (r *respositoryProduct) FindAll(pagination map[string]interface{}) (interfa
 			ch <- false
 			return
 		}
-		columns, err := rows.Columns()
-		if err != nil {
-			ch <- false
-			return
-		}
-		count := len(columns)
-		values := make([]interface{}, count)
-		valuePtrs := make([]interface{}, count)
-
-		for i, _ := range values {
-			var val interface{}
-			values[i] = val
-		}
+		cols, _ := rows.Columns()
 
 		for rows.Next() {
-			for i := range columns {
-				valuePtrs[i] = &values[i]
+			data := make(map[string]string)
+			columns := make([]string, len(cols))
+			columnPointers := make([]interface{}, len(cols))
+			for i, _ := range columns {
+				columnPointers[i] = &columns[i]
 			}
-
-			rows.Scan(valuePtrs...)
-			var arr = make(map[string]interface{})
-			for i, col := range columns {
-				val := values[i]
-				b, ok := val.([]byte)
-				var v interface{}
-				if ok {
-					v = string(b)
-				} else {
-					v = val
-				}
-				arr[col] = v
+			rows.Scan(columnPointers...)
+			for i, colName := range cols {
+				data[colName] = columns[i]
 			}
-			fmt.Println(arr)
-
-			prod = append(prod, arr)
+			fmt.Println(data)
+			prod = append(prod, data)
 		}
 		ch <- true
 	}(done)

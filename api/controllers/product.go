@@ -6,7 +6,6 @@ import (
 	"golang-boilerplates/api/repositories"
 	"golang-boilerplates/api/repositories/repo"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +16,8 @@ type Paging struct {
 	Field string
 }
 
+// type
+
 func GetProducts(c *gin.Context) {
 
 	var res = c.Writer
@@ -25,13 +26,11 @@ func GetProducts(c *gin.Context) {
 	limit := c.DefaultPostForm("limit", "10")
 	page := c.DefaultPostForm("page", "1")
 	field := c.DefaultPostForm("field", "*")
-
 	if field != "*" {
-		field = strings.Trim(field, "[")
-		field = strings.Trim(field, "]")
+		field = helper.ToStringField(field)
 	}
+	var arr = make(map[string]string, 0)
 
-	var arr = make(map[string]interface{})
 	arr["limit"] = limit
 	arr["page"] = page
 	arr["field"] = field
